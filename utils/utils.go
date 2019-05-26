@@ -7,6 +7,9 @@ import (
     "unicode"
     "math"
     "sort"
+    "os"
+    "log"
+    "bufio"
 )
 
 type ScoredText struct {
@@ -126,3 +129,23 @@ func Hex2b64(str string) []byte {
 func scoreText(in []byte) float64 {
     return math.Abs(1 - distance(makeStdFreq(), computeFrequencies(in)))
 }
+
+func StringArrayFromFile(filename string) (result []string) {
+    file,err := os.Open(filename)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        result = append(result, scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
+    return
+}
+
