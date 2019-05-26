@@ -16,6 +16,7 @@ func max(a, b int) int {
 func main() {
     ex1()
     ex2()
+    ex3()
 }
 
 func ex1() {
@@ -34,6 +35,19 @@ func ex2() {
 
 }
 
+func computeFrequencies(in []byte) (table [256]rune) {
+    for i := range in {
+        table[int(in[i])]++
+    }
+    return
+}
+
+func ex3() {
+    in := hex2bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736")
+    fmt.Println("score ", score(in))
+    fmt.Println("freq ", computeFrequencies(in))
+}
+
 func hex2bytes(ins string) []byte {
     in := []byte(ins)
     raw := make([]byte, hex.DecodedLen(len(in)))
@@ -45,4 +59,8 @@ func hex2b64(str string) []byte {
     raw := hex2bytes(str)
     encoded := base64.StdEncoding.EncodeToString(raw)
     return []byte (encoded)
+}
+
+func score(in []byte) int {
+    return 0
 }
