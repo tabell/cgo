@@ -91,20 +91,20 @@ func distance(a [256]float64, b [256]float64) (distance float64) {
 }
 
 type scoredText struct {
-    key rune
-    text string
-    score float64
+    Key rune
+    Text string
+    Score float64
 }
 
 func BestScore(in []byte, keys []rune) scoredText {
     scores := make([]scoredText, len(keys))
     for i := range keys {
-        scores[i].key = keys[i]
-        scores[i].text = string(Xor(in, []byte(string(scores[i].key))))
-        scores[i].score = scoreText([]byte(scores[i].text))
+        scores[i].Key = keys[i]
+        scores[i].Text = string(Xor(in, []byte(string(scores[i].Key))))
+        scores[i].Score = scoreText([]byte(scores[i].Text))
     }
     sort.Slice(scores, func(i, j int) bool {
-        return scores[i].score < scores[j].score
+        return scores[i].Score < scores[j].Score
     })
 
     return scores[0]
