@@ -9,6 +9,12 @@ import (
     "sort"
 )
 
+type ScoredText struct {
+    Key rune
+    Text string
+    Score float64
+}
+
 func max(a, b int) int {
     if a > b {
         return a
@@ -90,14 +96,8 @@ func distance(a [256]float64, b [256]float64) (distance float64) {
     return
 }
 
-type scoredText struct {
-    Key rune
-    Text string
-    Score float64
-}
-
-func BestScore(in []byte, keys []rune) scoredText {
-    scores := make([]scoredText, len(keys))
+func BestScore(in []byte, keys []rune) ScoredText {
+    scores := make([]ScoredText, len(keys))
     for i := range keys {
         scores[i].Key = keys[i]
         scores[i].Text = string(Xor(in, []byte(string(scores[i].Key))))
