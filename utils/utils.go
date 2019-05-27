@@ -99,7 +99,14 @@ func distance(a [256]float64, b [256]float64) (distance float64) {
     return
 }
 
-func BestScore(in []byte, keys []rune) ScoredText {
+func FindRepeatingXorKey(in []byte) ScoredText {
+    /* todo: make this table static */
+    keys := make([]rune, 256)
+    for i := range keys {
+        keys[i] = rune(i)
+    }
+
+    /* decode the string with each key and score the result */
     scores := make([]ScoredText, len(keys))
     for i := range keys {
         scores[i].Key = keys[i]
