@@ -10,6 +10,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+    "crypto/aes"
 )
 
 type ScoredText struct {
@@ -234,3 +235,40 @@ func FindKeysize(in []byte) int {
 	return results[0].length
 }
 
+func FindKey(in []byte, keysize int, cipher func([]byte, []byte)[]byte) (key []byte) {
+	blockCount := len(in) / keysize
+	remainder := len(in) % keysize
+	blockCount -= remainder
+	key = make([]byte, keysize)
+	for i := 0; i < keysize; i++ {
+		bucket := make([]byte, blockCount)
+		for j := 0; j < blockCount; j++ {
+			bucket[j] = in[j*keysize+i]
+		}
+
+		bestKey := FindBestKey(bucket, cipher)
+		key[i] = byte(bestKey.Key)
+	}
+
+	return
+}
+
+func AesEcb(ct []byte, key []byte)(pt []byte) {
+    if len(key) % 16 != 0 {
+        log.Fatal("Key size", len(key), "invalid for AES")
+    }
+	cipher, err := aes.NewCipher(key)
+	if err != nil {
+		log.Fatal("Error creating aes block cipher:", err)
+	}
+
+	blocksize := len(key)
+    blocks := len(ct) / len(key)
+	pt = make([]byte, len(ct))
+
+	for x := 0; x < blocks; x++ {
+		cipher.Decrypt(pt[x*blocksize:(x+1)*blocksize], ct[x*blocksize:(x+1)*blocksize])
+	}
+
+    return
+}
