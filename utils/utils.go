@@ -95,7 +95,7 @@ func distance(a [256]float64, b [256]float64) (distance float64) {
 	return
 }
 
-func FindRepeatingXorKey(in []byte) ScoredText {
+func FindBestKey(in []byte, cipher func([]byte, []byte)[]byte) ScoredText {
 	/* todo: make this table static */
 	keys := make([]rune, 256)
 	for i := range keys {
@@ -105,20 +105,16 @@ func FindRepeatingXorKey(in []byte) ScoredText {
 	/* decode the string with each key and score the result */
 	scores := make([]ScoredText, len(keys))
 	for i := range keys {
-		//scores[i].Text = string(Xor(in, []byte(string(scores[i].Key))))
 		k := make([]byte, 1)
 		scores[i].Key = byte(i)
 		k[0] = scores[i].Key
-		scores[i].Text = string(Xor(in, k))
+		scores[i].Text = string(cipher(in, k))
 		scores[i].Score = scoreText([]byte(scores[i].Text))
-		//(%c) --> score = %f: key=%c decoded=%s",
-		//	i, i, scores[i].Score, scores[i].Key, scores[i].Text)
 	}
+
 	sort.Slice(scores, func(i, j int) bool {
 		return scores[i].Score < scores[j].Score
 	})
-
-	//log.Printf(scores[0].Text)
 
 	return scores[0]
 }
@@ -182,3 +178,59 @@ func BytesFromBase64File(filename string) (raw []byte) {
 	}
 	return
 }
+
+func bitCount(in byte) int {
+	count := 0
+	for x := 0; x < 8; x++ {
+		if ((in >> uint8(x)) & 0x1) == 1 {
+			count++
+		}
+	}
+	return count
+}
+
+func hamm(a []byte, b []byte) int {
+	count := 0
+	for x := range a {
+		c := a[x] ^ b[x]
+		count += bitCount(c)
+	}
+	return count
+}
+
+func qualify() {
+	a := "this is a test"
+	b := "wokka wokka!!!"
+
+	log.Println(a, b, hamm([]byte(a), []byte(b)))
+}
+
+type editMap struct {
+	length int
+	score  float64
+}
+
+func selfCorrelate(in []byte, size int) (result editMap) {
+	blocks := len(in) / size
+	score := 0.0
+	for b := 0; b < blocks-1; b++ {
+		s1 := size * b
+		s2 := size * (b + 1)
+		s3 := size * (b + 2)
+		score += float64(hamm(in[s1:s2], in[s2:s3])) / float64(size)
+	}
+	result.score = score / float64(blocks)
+	result.length = size
+	return
+}
+
+func FindKeysize(in []byte) int {
+	results := make([]editMap, 40)
+	for keysize := 2; keysize < 40; keysize++ {
+		results[keysize] = selfCorrelate(in, keysize)
+	}
+	results = results[2:] /* hack because there needs to be a 0th elem */
+	sort.Slice(results, func(i, j int) bool { return results[i].score < results[j].score })
+	return results[0].length
+}
+

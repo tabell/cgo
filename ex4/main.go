@@ -14,7 +14,7 @@ func main() {
 
     for i,str := range inStrings {
         in := utils.Hex2bytes(str)
-        result := utils.FindRepeatingXorKey(in)
+        result := utils.FindBestKey(in, utils.Xor)
         results[i] = result
     }
 
