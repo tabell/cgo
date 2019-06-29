@@ -2,16 +2,14 @@ package main
 
 import (
 	"crypto/aes"
-	"encoding/base64"
 	"github.com/tabell/cpals/utils"
 	"log"
-	"strings"
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Printf("Hello world")
-	ct := bytesFromBase64File("ex7/ct.b64")
+	ct := utils.BytesFromBase64File("ex7/ct.b64")
 	key := []byte("YELLOW SUBMARINE")
 
 	cipher, err := aes.NewCipher(key)
@@ -31,28 +29,4 @@ func main() {
 
 	log.Print("Decrypted: ", string(plain))
 
-}
-
-func bytesFromBase64File(filename string) (raw []byte) {
-	/* load base64 from file */
-	encodedStrings := utils.StringArrayFromFile(filename)
-	var bigStr strings.Builder
-
-	/* build into one large base64 buffer */
-	for _, s := range encodedStrings {
-		bigStr.WriteString(s)
-	}
-
-	/* allocate ..? */
-	raw = make([]byte, base64.StdEncoding.DecodedLen(len(bigStr.String())))
-
-	/* convert base64 to raw bytes */
-	data, err := base64.StdEncoding.DecodeString(bigStr.String())
-	if err != nil {
-		log.Fatal("Couldn't decode base64:", err)
-	}
-	for i, b := range data {
-		raw[i] = b
-	}
-	return
 }
