@@ -14,7 +14,7 @@ import (
 )
 
 type ScoredText struct {
-	Key   byte
+	Key   []byte
 	Text  string
 	Score float64
 }
@@ -38,33 +38,33 @@ func Xor(a []byte, b []byte) []byte {
 }
 
 func makeStdFreq() (table [256]float64) {
-	table[int(' ')] = 13
-	table[int('A')] = 08.167
-	table[int('B')] = 01.492
-	table[int('C')] = 02.782
-	table[int('D')] = 04.253
+	table[int(' ')] = 13 /* Guessed this value */
+	table[int('A')] =  8.167
+	table[int('B')] =  1.492
+	table[int('C')] =  2.782
+	table[int('D')] =  4.253
 	table[int('E')] = 12.702
-	table[int('F')] = 02.228
-	table[int('G')] = 02.015
-	table[int('H')] = 06.094
-	table[int('I')] = 06.966
-	table[int('J')] = 00.153
-	table[int('K')] = 00.772
-	table[int('L')] = 04.025
-	table[int('M')] = 02.406
-	table[int('N')] = 06.749
-	table[int('O')] = 07.507
-	table[int('P')] = 01.929
-	table[int('Q')] = 00.095
-	table[int('R')] = 05.987
-	table[int('S')] = 06.327
-	table[int('T')] = 09.056
-	table[int('U')] = 02.758
-	table[int('V')] = 00.978
-	table[int('W')] = 02.360
-	table[int('X')] = 00.150
-	table[int('Y')] = 01.974
-	table[int('Z')] = 00.074
+	table[int('F')] =  2.228
+	table[int('G')] =  2.015
+	table[int('H')] =  6.094
+	table[int('I')] =  6.966
+	table[int('J')] =  0.153
+	table[int('K')] =  0.772
+	table[int('L')] =  4.025
+	table[int('M')] =  2.406
+	table[int('N')] =  6.749
+	table[int('O')] =  7.507
+	table[int('P')] =  1.929
+	table[int('Q')] =  0.095
+	table[int('R')] =  5.987
+	table[int('S')] =  6.327
+	table[int('T')] =  9.056
+	table[int('U')] =  2.758
+	table[int('V')] =  0.978
+	table[int('W')] =  2.360
+	table[int('X')] =  0.150
+	table[int('Y')] =  1.974
+	table[int('Z')] =  0.074
 	return table
 }
 
@@ -107,8 +107,8 @@ func FindBestKey(in []byte, cipher func([]byte, []byte)[]byte) ScoredText {
 	scores := make([]ScoredText, len(keys))
 	for i := range keys {
 		k := make([]byte, 1)
-		scores[i].Key = byte(i)
-		k[0] = scores[i].Key
+        k[0] = byte(i)
+		scores[i].Key = k
 		scores[i].Text = string(cipher(in, k))
 		scores[i].Score = scoreText([]byte(scores[i].Text))
 	}
@@ -247,7 +247,7 @@ func FindKey(in []byte, keysize int, cipher func([]byte, []byte)[]byte) (key []b
 		}
 
 		bestKey := FindBestKey(bucket, cipher)
-		key[i] = byte(bestKey.Key)
+		key[i] = byte(bestKey.Key[0])
 	}
 
 	return

@@ -23,5 +23,5 @@ func main() {
     })
     winningResult := results[0]
 
-    fmt.Printf("key=%c score=%.3f msg=%s\n", rune(winningResult.Key), winningResult.Score, winningResult.Text)
+    fmt.Printf("key=%c score=%.3f msg=%s\n", winningResult.Key[0], winningResult.Score, winningResult.Text)
 }
