@@ -96,7 +96,7 @@ func distance(a [256]float64, b [256]float64) (distance float64) {
 	return
 }
 
-func FindBestKey(in []byte, cipher func([]byte, []byte)[]byte) ScoredText {
+func FindBestKey(in []byte, KeyLen int, cipher func([]byte, []byte)[]byte) ScoredText {
 	/* todo: make this table static */
 	keys := make([]rune, 256)
 	for i := range keys {
@@ -106,7 +106,7 @@ func FindBestKey(in []byte, cipher func([]byte, []byte)[]byte) ScoredText {
 	/* decode the string with each key and score the result */
 	scores := make([]ScoredText, len(keys))
 	for i := range keys {
-		k := make([]byte, 1)
+		k := make([]byte, KeyLen)
         k[0] = byte(i)
 		scores[i].Key = k
 		scores[i].Text = string(cipher(in, k))
