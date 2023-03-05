@@ -120,19 +120,6 @@ func FindBestKey(in []byte, cipher func([]byte, []byte)[]byte) ScoredText {
 	return scores[0]
 }
 
-func Hex2bytes(ins string) []byte {
-	in := []byte(ins)
-	raw := make([]byte, hex.DecodedLen(len(in)))
-	hex.Decode(raw, in)
-	return raw
-}
-
-func Hex2b64(str string) []byte {
-	raw := Hex2bytes(str)
-	encoded := base64.StdEncoding.EncodeToString(raw)
-	return []byte(encoded)
-}
-
 func scoreText(in []byte) float64 {
 	return math.Abs(1 - distance(makeStdFreq(), computeFrequencies(in)))
 }
